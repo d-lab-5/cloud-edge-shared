@@ -1,0 +1,15 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 0fd0f6c
+_src_path: gh:d-lab-5/template-dlab5-shared
+app_repos: d-lab-5/template-dlab5-cloud, d-lab-5/template-dlab5-edge
+description: 'How a D-LAB-5 cloud and its edges work together: linking an edge, keeping
+    its token, syncing knowledge both ways, and a chat that proposes while the person
+    decides.'
+diagram_groups: Overview, Flows, Models
+domain: d-lab-5
+languages: en
+ontology: false
+own_domain: ''
+product: Cloud and Edge
+repo: d-lab-5/cloud-edge-shared
+slug: cloud-edge

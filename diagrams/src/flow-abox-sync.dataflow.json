@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Syncing an A-Box both ways",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "output": "diagrams/flow-abox-sync.html"
+  },
+  "stages": [
+    { "label": "Three copies" },
+    { "label": "Merge" },
+    { "label": "Check" },
+    { "label": "Write" },
+    { "label": "Remember" }
+  ],
+  "nodes": [
+    { "id": "mine", "type": "database", "label": "Edge's A-Box", "sublabel": "abox/<space>.ttl", "stage": 0, "row": 0 },
+    { "id": "base", "type": "database", "label": "Last agreed", "sublabel": "abox/.sync/<connection>/", "stage": 0, "row": 1 },
+    { "id": "theirs", "type": "cloud", "label": "Cloud's graph", "sublabel": "graphs/get", "stage": 0, "row": 2 },
+    { "id": "merge", "type": "backend", "label": "sync.merge", "sublabel": "statement sets", "stage": 1, "row": 1 },
+    { "id": "conflict", "type": "external", "label": "A conflict", "sublabel": "the person picks", "stage": 2, "row": 0, "tag": "single-valued" },
+    { "id": "shapes", "type": "security", "label": "SHACL shapes", "sublabel": "the cloud's own", "stage": 2, "row": 1 },
+    { "id": "local", "type": "database", "label": "Edge's A-Box", "sublabel": "if changed there", "stage": 3, "row": 0 },
+    { "id": "put", "type": "cloud", "label": "graphs/put", "sublabel": "baseVersion", "stage": 3, "row": 2, "tag": "409: merge again" },
+    { "id": "newbase", "type": "database", "label": "New base", "sublabel": "and its version", "stage": 4, "row": 1 }
+  ],
+  "flows": [
+    { "id": "mine-merge", "from": "mine", "to": "merge", "label": "mine" },
+    { "id": "base-merge", "from": "base", "to": "merge", "label": "base", "variant": "emphasis" },
+    { "id": "theirs-merge", "from": "theirs", "to": "merge", "label": "theirs" },
+    { "id": "merge-conflict", "from": "merge", "to": "conflict", "label": "two values", "variant": "dashed" },
+    { "id": "merge-shapes", "from": "merge", "to": "shapes", "label": "merged", "variant": "emphasis" },
+    { "id": "shapes-local", "from": "shapes", "to": "local", "label": "valid" },
+    { "id": "shapes-put", "from": "shapes", "to": "put", "label": "if changed here", "variant": "security" },
+    { "id": "local-newbase", "from": "local", "to": "newbase", "label": "saved" },
+    { "id": "put-newbase", "from": "put", "to": "newbase", "label": "version" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "The rule", "items": ["merged = base − removed here − removed there + added here + added there", "Blank nodes are named canonically first, so two parses compare"] },
+    { "dot": "amber", "title": "The one disagreement", "items": ["Two different values for a fact that may have one (settings.SINGLE_VALUED, PER_LANGUAGE): nothing is written", "The person picks mine or theirs, and the sync runs again"] },
+    { "dot": "rose", "title": "Nothing invalid is written", "items": ["The merged graph passes the shapes before either side changes", "The cloud checks again: 422 shows the problems; 409 means someone saved since, so merge once more", "The base is kept per connection, so linking into another tenant never merges the two"] }
+  ]
+}

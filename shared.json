@@ -1,0 +1,22 @@
+{
+  "app_repos": [
+    {
+      "private": false,
+      "repo": "d-lab-5/template-dlab5-cloud"
+    },
+    {
+      "private": false,
+      "repo": "d-lab-5/template-dlab5-edge"
+    }
+  ],
+  "description": "How a D-LAB-5 cloud and its edges work together: linking an edge, keeping its token, syncing knowledge both ways, and a chat that proposes while the person decides.",
+  "domain": "d-lab-5",
+  "languages": [
+    "en"
+  ],
+  "ontology": null,
+  "own_domain": "",
+  "product": "Cloud and Edge",
+  "repo": "d-lab-5/cloud-edge-shared",
+  "slug": "cloud-edge"
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": 3,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "A connection's life",
+    "output": "diagrams/model-connection.html",
+    "quality_profile": "showcase"
+  },
+  "mainPath": ["unlinked", "pairing", "linked", "renewing"],
+  "states": [
+    { "id": "unlinked", "type": "start", "label": "Not linked", "sublabel": "no token", "step": "01" },
+    { "id": "pairing", "type": "waiting", "label": "Pairing", "sublabel": "code shown", "tag": "waits for an admin", "step": "02" },
+    { "id": "linked", "type": "success", "label": "Linked", "sublabel": "one tenant", "tag": "device token", "step": "03" },
+    { "id": "renewing", "type": "active", "label": "Renewing", "sublabel": "token/rotate", "tag": "30 days left", "step": "04" },
+    { "id": "tooold", "type": "waiting", "label": "Edge too old", "sublabel": "426", "tag": "update the edge" },
+    { "id": "notenant", "type": "waiting", "label": "No tenant", "sublabel": "403 no_tenant", "tag": "link again" },
+    { "id": "revoked", "type": "failure", "label": "Revoked", "sublabel": "410", "tag": "token forgotten" }
+  ],
+  "transitions": [
+    { "id": "unlinked-pairing", "from": "unlinked", "to": "pairing", "label": "add connection" },
+    { "id": "pairing-linked", "from": "pairing", "to": "linked", "label": "admin approves", "variant": "security" },
+    { "id": "linked-renewing", "from": "linked", "to": "renewing", "label": "due" },
+    { "id": "renewing-linked", "from": "renewing", "to": "linked", "label": "new token" },
+    { "id": "pairing-unlinked", "from": "pairing", "to": "unlinked", "label": "denied or expired" },
+    { "id": "linked-tooold", "from": "linked", "to": "tooold", "label": "426", "variant": "dashed" },
+    { "id": "tooold-linked", "from": "tooold", "to": "linked", "label": "updated" },
+    { "id": "linked-notenant", "from": "linked", "to": "notenant", "label": "403", "variant": "dashed" },
+    { "id": "notenant-pairing", "from": "notenant", "to": "pairing", "label": "link again" },
+    { "id": "linked-revoked", "from": "linked", "to": "revoked", "label": "410", "variant": "security" },
+    { "id": "revoked-pairing", "from": "revoked", "to": "pairing", "label": "link again" },
+    { "id": "linked-unlinked", "from": "linked", "to": "unlinked", "label": "unlink" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "One per cloud", "items": ["An edge keeps a connection per cloud it is linked to (sandbox, stage, prod), each with its own token", "keep_fresh() renews every connection that is due, at start and every twelve hours"] },
+    { "dot": "amber", "title": "Waiting, not broken", "items": ["426: the cloud wants a newer edge; nothing else changes", "403 no_tenant: linked before it had a tenant; link it again"] },
+    { "dot": "rose", "title": "Gone means gone", "items": ["A bare 410 means the link was revoked: the edge forgets the token", "A 410 with a product's own error code means only that item is gone; the link stays"] }
+  ]
+}

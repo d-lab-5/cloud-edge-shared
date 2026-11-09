@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Linking an edge to a cloud",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "output": "diagrams/flow-link-an-edge.html"
+  },
+  "participants": [
+    {
+      "id": "person",
+      "type": "external",
+      "label": "A person",
+      "sublabel": "at the edge"
+    },
+    {
+      "id": "page",
+      "type": "frontend",
+      "label": "Edge page",
+      "sublabel": "Connections"
+    },
+    {
+      "id": "edge",
+      "type": "backend",
+      "label": "cloud.py",
+      "sublabel": "on the edge"
+    },
+    {
+      "id": "api",
+      "type": "security",
+      "label": "Edge API",
+      "sublabel": "/edge/v1"
+    },
+    {
+      "id": "admin",
+      "type": "external",
+      "label": "Tenant admin",
+      "sublabel": "on /link"
+    }
+  ],
+  "segments": [
+    {
+      "from": 140,
+      "to": 330,
+      "label": "Ask for a code"
+    },
+    {
+      "from": 340,
+      "to": 520,
+      "label": "A person approves"
+    },
+    {
+      "from": 530,
+      "to": 720,
+      "label": "Linked to one tenant"
+    }
+  ],
+  "messages": [
+    {
+      "id": "add",
+      "from": "person",
+      "to": "page",
+      "y": 160,
+      "label": "+ Add connection",
+      "variant": "emphasis"
+    },
+    {
+      "id": "start",
+      "from": "page",
+      "to": "edge",
+      "y": 190,
+      "label": "POST /api/cloud/link"
+    },
+    {
+      "id": "authz",
+      "from": "edge",
+      "to": "api",
+      "y": 220,
+      "label": "device_authorization"
+    },
+    {
+      "id": "code",
+      "from": "api",
+      "to": "edge",
+      "y": 250,
+      "label": "user_code, verification_uri",
+      "variant": "return"
+    },
+    {
+      "id": "show",
+      "from": "edge",
+      "to": "page",
+      "y": 280,
+      "label": "the code to show",
+      "variant": "return",
+      "note": "The page polls every three seconds while the pairing waits."
+    },
+    {
+      "id": "tell",
+      "from": "person",
+      "to": "admin",
+      "y": 370,
+      "label": "tells the code",
+      "variant": "dashed"
+    },
+    {
+      "id": "poll",
+      "from": "edge",
+      "to": "api",
+      "y": 400,
+      "label": "token, every interval"
+    },
+    {
+      "id": "pending",
+      "from": "api",
+      "to": "edge",
+      "y": 430,
+      "label": "authorization_pending",
+      "variant": "return"
+    },
+    {
+      "id": "approve",
+      "from": "admin",
+      "to": "api",
+      "y": 470,
+      "label": "approveDeviceCode(code, tenant)",
+      "variant": "security",
+      "note": "Only that tenant's admins may link an edge to it."
+    },
+    {
+      "id": "token",
+      "from": "edge",
+      "to": "api",
+      "y": 550,
+      "label": "token",
+      "variant": "emphasis"
+    },
+    {
+      "id": "granted",
+      "from": "api",
+      "to": "edge",
+      "y": 580,
+      "label": "device token, edge_id",
+      "variant": "return",
+      "note": "The cloud keeps only its sha256; the edge keeps it in a 0600 file."
+    },
+    {
+      "id": "tenant",
+      "from": "edge",
+      "to": "api",
+      "y": 640,
+      "label": "tenant"
+    },
+    {
+      "id": "spaces",
+      "from": "api",
+      "to": "edge",
+      "y": 670,
+      "label": "tenant, spaces by name",
+      "variant": "return"
+    },
+    {
+      "id": "linked",
+      "from": "edge",
+      "to": "page",
+      "y": 700,
+      "label": "linked; first start syncs",
+      "variant": "return"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "No password on the edge",
+      "items": [
+        "RFC 8628: the edge shows a code, a signed-in admin approves it",
+        "The device token is the only credential, rotated 30 days before it expires"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Waiting is polite",
+      "items": [
+        "authorization_pending: ask again after the interval",
+        "slow_down: five seconds more; access_denied or expired_token: start again"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Revoking one edge",
+      "items": [
+        "Settings → Edges revokes one token; that edge then gets 410 and forgets it",
+        "Every other edge of the tenant keeps working"
+      ]
+    }
+  ]
+}

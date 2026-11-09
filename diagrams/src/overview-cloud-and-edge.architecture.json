@@ -1,0 +1,383 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "A cloud and its edges",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "output": "diagrams/overview-cloud-and-edge.html",
+    "views": [
+      {
+        "id": "link",
+        "label": "Linking",
+        "focus": [
+          "cloudpy",
+          "edgeapi",
+          "link",
+          "admin"
+        ],
+        "note": "The edge never holds a password: a tenant admin approves its code on the cloud's /link, and the edge keeps one device token for that tenant."
+      },
+      {
+        "id": "sync",
+        "label": "Knowledge",
+        "focus": [
+          "routes",
+          "sync",
+          "abox",
+          "cloudpy",
+          "edgeapi",
+          "graphs"
+        ],
+        "note": "One A-Box per space, merged both ways statement by statement, and checked against the same shapes on both sides."
+      },
+      {
+        "id": "chat",
+        "label": "The chat",
+        "focus": [
+          "page",
+          "routes",
+          "chat",
+          "claude",
+          "mcp"
+        ],
+        "note": "The person's own Claude Code with only this edge's tools. Every change it wants comes back as a proposal the person confirms."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "person",
+      "type": "external",
+      "label": "A person",
+      "sublabel": "at this computer",
+      "pos": [
+        40,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "page",
+      "type": "frontend",
+      "label": "The edge's page",
+      "sublabel": "edge/static/edge.js",
+      "pos": [
+        260,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "routes",
+      "type": "security",
+      "label": "routes.py",
+      "sublabel": "localhost only",
+      "pos": [
+        480,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "tag": "the guard"
+    },
+    {
+      "id": "chat",
+      "type": "backend",
+      "label": "chat.py",
+      "sublabel": "proposals, history",
+      "pos": [
+        480,
+        40
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "claude",
+      "type": "external",
+      "label": "Claude Code",
+      "sublabel": "the person's account",
+      "pos": [
+        720,
+        40
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "tag": "no tools of its own"
+    },
+    {
+      "id": "mcp",
+      "type": "backend",
+      "label": "MCP server",
+      "sublabel": "edge/mcp_tools.py",
+      "pos": [
+        720,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "tag": "panel mode"
+    },
+    {
+      "id": "abox",
+      "type": "database",
+      "label": "A-Boxes",
+      "sublabel": "one per space",
+      "pos": [
+        260,
+        360
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "sync",
+      "type": "backend",
+      "label": "sync.py",
+      "sublabel": "three-way merge",
+      "pos": [
+        480,
+        360
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "cloudpy",
+      "type": "backend",
+      "label": "cloud.py",
+      "sublabel": "device token, 0600",
+      "pos": [
+        720,
+        360
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "edgeapi",
+      "type": "security",
+      "label": "Edge API",
+      "sublabel": "/edge/v1",
+      "pos": [
+        980,
+        360
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "tag": "426 below the minimum"
+    },
+    {
+      "id": "graphs",
+      "type": "database",
+      "label": "Graph per space",
+      "sublabel": "the tenant's spaces",
+      "pos": [
+        1220,
+        360
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "link",
+      "type": "frontend",
+      "label": "/link",
+      "sublabel": "Settings → Edges",
+      "pos": [
+        980,
+        540
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "admin",
+      "type": "external",
+      "label": "Tenant admin",
+      "sublabel": "signed in to the cloud",
+      "pos": [
+        720,
+        560
+      ],
+      "size": [
+        150,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "The edge: a tool on this computer",
+      "wraps": [
+        "page",
+        "routes",
+        "chat",
+        "claude",
+        "mcp",
+        "abox",
+        "sync",
+        "cloudpy"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "The cloud",
+      "wraps": [
+        "edgeapi",
+        "graphs",
+        "link"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "person-page",
+      "from": "person",
+      "to": "page",
+      "label": "uses",
+      "variant": "emphasis"
+    },
+    {
+      "id": "page-routes",
+      "from": "page",
+      "to": "routes",
+      "label": "/api/…",
+      "variant": "emphasis"
+    },
+    {
+      "id": "routes-chat",
+      "from": "routes",
+      "to": "chat",
+      "label": "ask",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "chat-claude",
+      "from": "chat",
+      "to": "claude",
+      "label": "claude -p"
+    },
+    {
+      "id": "claude-mcp",
+      "from": "claude",
+      "to": "mcp",
+      "label": "only these tools",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "mcp-routes",
+      "from": "mcp",
+      "to": "routes",
+      "label": "a proposal",
+      "variant": "security"
+    },
+    {
+      "id": "routes-sync",
+      "from": "routes",
+      "to": "sync",
+      "label": "sync job",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "sync-abox",
+      "from": "sync",
+      "to": "abox",
+      "label": "merged"
+    },
+    {
+      "id": "sync-cloudpy",
+      "from": "sync",
+      "to": "cloudpy",
+      "label": "graphs/get, put"
+    },
+    {
+      "id": "cloudpy-edgeapi",
+      "from": "cloudpy",
+      "to": "edgeapi",
+      "label": "Bearer dt_v1",
+      "variant": "security"
+    },
+    {
+      "id": "edgeapi-graphs",
+      "from": "edgeapi",
+      "to": "graphs",
+      "label": "tenant from the token"
+    },
+    {
+      "id": "admin-link",
+      "from": "admin",
+      "to": "link",
+      "label": "approves the code"
+    },
+    {
+      "id": "link-edgeapi",
+      "from": "link",
+      "to": "edgeapi",
+      "label": "binds to a tenant",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "bottom"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Who owns what",
+      "items": [
+        "template-dlab5-edge owns edge/: cloud.py, sync.py, knowledge.py, jobs.py, chat.py, routes.py, mcp_tools.py",
+        "The tool owns edge/settings.py: its prompt, CHAT_ALLOWED, single-valued facts, first-start steps",
+        "template-dlab5-cloud owns the Edge API functions and /link"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "The boundaries",
+      "items": [
+        "routes.py answers to localhost only, refuses writes from other sites and cannot be framed",
+        "The cloud takes the tenant from the token row, never from the body",
+        "A tenant admin links an edge; an operator can list and revoke, never link"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "One wire",
+      "items": [
+        "DH-SPEC-100's device flow, profiled in template-dlab5-cloud's docs/specs/edge-cloud-api.md",
+        "Every call carries X-Edge-Version; below MIN_EDGE_VERSION every route answers 426",
+        "One edge can hold several connections: sandbox, stage, prod"
+      ]
+    }
+  ]
+}

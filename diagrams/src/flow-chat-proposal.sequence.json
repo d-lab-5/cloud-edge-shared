@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "The chat proposes, the person decides",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "output": "diagrams/flow-chat-proposal.html"
+  },
+  "participants": [
+    {
+      "id": "person",
+      "type": "external",
+      "label": "A person",
+      "sublabel": "at the edge"
+    },
+    {
+      "id": "page",
+      "type": "frontend",
+      "label": "Chat panel",
+      "sublabel": "edge.js"
+    },
+    {
+      "id": "routes",
+      "type": "security",
+      "label": "Edge routes",
+      "sublabel": "routes.py, chat.py"
+    },
+    {
+      "id": "claude",
+      "type": "external",
+      "label": "Claude Code",
+      "sublabel": "claude -p"
+    },
+    {
+      "id": "mcp",
+      "type": "backend",
+      "label": "MCP server",
+      "sublabel": "panel mode"
+    }
+  ],
+  "segments": [
+    {
+      "from": 140,
+      "to": 330,
+      "label": "Ask"
+    },
+    {
+      "from": 340,
+      "to": 520,
+      "label": "A change becomes a proposal"
+    },
+    {
+      "from": 530,
+      "to": 700,
+      "label": "Only a click runs it"
+    }
+  ],
+  "messages": [
+    {
+      "id": "ask",
+      "from": "person",
+      "to": "page",
+      "y": 160,
+      "label": "sync the knowledge",
+      "variant": "emphasis"
+    },
+    {
+      "id": "post",
+      "from": "page",
+      "to": "routes",
+      "y": 190,
+      "label": "POST /api/chat"
+    },
+    {
+      "id": "run",
+      "from": "routes",
+      "to": "claude",
+      "y": 225,
+      "label": "news + message",
+      "note": "First a line with what the person decided since the last answer, and a new selection if there is one."
+    },
+    {
+      "id": "tool",
+      "from": "claude",
+      "to": "mcp",
+      "y": 290,
+      "label": "sync_knowledge()"
+    },
+    {
+      "id": "propose",
+      "from": "mcp",
+      "to": "routes",
+      "y": 360,
+      "label": "POST /api/chat/proposals",
+      "variant": "security",
+      "note": "Only a call in CHAT_ALLOWED; it waits in chat-proposals.json."
+    },
+    {
+      "id": "id",
+      "from": "routes",
+      "to": "mcp",
+      "y": 420,
+      "label": "p<run>-<n>",
+      "variant": "return"
+    },
+    {
+      "id": "notrun",
+      "from": "mcp",
+      "to": "claude",
+      "y": 450,
+      "label": "proposed, it has NOT run",
+      "variant": "return"
+    },
+    {
+      "id": "stream",
+      "from": "claude",
+      "to": "routes",
+      "y": 480,
+      "label": "stream-json",
+      "variant": "return"
+    },
+    {
+      "id": "card",
+      "from": "routes",
+      "to": "page",
+      "y": 510,
+      "label": "answer + proposal card",
+      "variant": "return"
+    },
+    {
+      "id": "confirm",
+      "from": "person",
+      "to": "page",
+      "y": 550,
+      "label": "Confirm",
+      "variant": "emphasis"
+    },
+    {
+      "id": "post-confirm",
+      "from": "page",
+      "to": "routes",
+      "y": 580,
+      "label": "…/proposals/<id>/confirm",
+      "note": "Runs the one proposed call on the edge's own API, once."
+    },
+    {
+      "id": "outcome",
+      "from": "routes",
+      "to": "page",
+      "y": 640,
+      "label": "done, or why it failed",
+      "variant": "return"
+    },
+    {
+      "id": "next",
+      "from": "routes",
+      "to": "claude",
+      "y": 680,
+      "label": "told with the next message",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Claude gets only this edge",
+      "items": [
+        "--tools \"\": no shell, no files, no web",
+        "--strict-mcp-config: only this edge's MCP server; stop_server is not allowed",
+        "Signed in with the person's own claude.ai account: no API key"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "It remembers, here",
+      "items": [
+        "Waiting proposals outlive a restart and are checked against CHAT_ALLOWED again",
+        "proposals() lists every outcome; the last ten conversations can be continued"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "A stale card cannot confirm",
+      "items": [
+        "Ids carry a part that differs per run of the edge",
+        "A proposal is confirmed or dismissed once; a second click gets 409"
+      ]
+    }
+  ]
+}
